@@ -7,11 +7,11 @@ public class Plan {
     public Plan() {
     }
 
-    Plan(String name) {
+    public Plan(String name) {
         this.name = name;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
