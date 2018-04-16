@@ -10,6 +10,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
@@ -18,12 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mgr.life.item.ItemController.END_POINT;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ItemControllerIntegrationTest {
 
     @LocalServerPort
@@ -40,6 +41,10 @@ public class ItemControllerIntegrationTest {
     @Before
     public void setUp() throws Exception {
         this.base = new URL("http://localhost:" + port + END_POINT);
+    }
+
+    @Test
+    public void itemGetIntegrationTest() {
 
         List<Item> data = new ArrayList<>();
 
@@ -48,14 +53,12 @@ public class ItemControllerIntegrationTest {
         }
 
         itemRepository.saveAll(data);
-    }
 
-    @Test
-    public void planGetTest() {
         ResponseEntity<List<Item>> response = template.exchange(base.toString(), HttpMethod.GET, null,
                 new ParameterizedTypeReference<List<Item>>() {
                 });
         assertThat(response.getBody(), notNullValue());
+        assertThat(response.getBody(), hasSize(2));
 
         for (int i = 0; i < 2; i++) {
             assertThat(response.getBody().get(i).getId(), equalTo((long) i + 1));
@@ -66,5 +69,19 @@ public class ItemControllerIntegrationTest {
                     new BigDecimal(1000 * (i + 1)).setScale(2, BigDecimal.ROUND_HALF_EVEN))
             );
         }
+    }
+
+    @Test
+    public void itemPostIntegrationTest() {
+
+        ResponseEntity<Item> response = template.postForEntity(base.toString(),
+                new Item("Test Item", "Test Type", new BigDecimal(3000.50)),
+                Item.class);
+
+        assertThat(response.getBody(), notNullValue());
+        assertThat(response.getBody().getId(), equalTo(1L));
+        assertThat(response.getBody().getName(), equalTo("Test Item"));
+        assertThat(response.getBody().getType(), equalTo("Test Type"));
+        assertThat(response.getBody().getPrice(), equalTo(new BigDecimal(3000.50)));
     }
 }
