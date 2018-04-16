@@ -36,7 +36,7 @@ public class ItemControllerTest {
 
         for (int i = 0; i < 2; i++) {
             resultActions
-                    .andExpect(jsonPath("$[" + i + "].id", is(i)))
+                    .andExpect(jsonPath("$[" + i + "].id", is(i + 1)))
                     .andExpect(jsonPath("$[" + i + "].name", is("Item " + i)))
                     .andExpect(jsonPath("$[" + i + "].type", is("Type " + i)))
                     .andExpect(jsonPath("$[" + i + "].price", is(1000 * (i + 1))));
