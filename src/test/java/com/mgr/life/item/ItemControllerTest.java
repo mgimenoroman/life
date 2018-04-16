@@ -1,28 +1,55 @@
 package com.mgr.life.item;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mgr.life.item.ItemController.END_POINT;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureMockMvc
 public class ItemControllerTest {
 
-    @Autowired
     private MockMvc mvc;
+
+    @Mock
+    private ItemRepository itemRepository;
+
+    @InjectMocks
+    private ItemController itemController;
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+
+        mvc = MockMvcBuilders.standaloneSetup(itemController).build();
+
+        List<Item> data = new ArrayList<>();
+
+        for (int x = 0; x < 2; x++) {
+            data.add(new Item((long) x + 1, "Item " + x, "Type " + x, new BigDecimal(1000.99 * (x + 1))));
+        }
+
+        when(itemRepository.findAll()).thenReturn(data);
+    }
 
     @Test
     public void itemGetTest() throws Exception {
@@ -39,7 +66,7 @@ public class ItemControllerTest {
                     .andExpect(jsonPath("$[" + i + "].id", is(i + 1)))
                     .andExpect(jsonPath("$[" + i + "].name", is("Item " + i)))
                     .andExpect(jsonPath("$[" + i + "].type", is("Type " + i)))
-                    .andExpect(jsonPath("$[" + i + "].price", is(1000 * (i + 1))));
+                    .andExpect(jsonPath("$[" + i + "].price", is(new BigDecimal(1000.99 * (i + 1)))));
         }
     }
 }

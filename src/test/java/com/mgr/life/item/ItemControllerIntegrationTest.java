@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mgr.life.item.ItemController.END_POINT;
@@ -33,9 +34,20 @@ public class ItemControllerIntegrationTest {
     @Autowired
     private TestRestTemplate template;
 
+    @Autowired
+    private ItemRepository itemRepository;
+
     @Before
     public void setUp() throws Exception {
         this.base = new URL("http://localhost:" + port + END_POINT);
+
+        List<Item> data = new ArrayList<>();
+
+        for (int x = 0; x < 2; x++) {
+            data.add(new Item((long) x + 1, "Item " + x, "Type " + x, new BigDecimal(1000 * (x + 1))));
+        }
+
+        itemRepository.saveAll(data);
     }
 
     @Test
@@ -49,7 +61,10 @@ public class ItemControllerIntegrationTest {
             assertThat(response.getBody().get(i).getId(), equalTo((long) i + 1));
             assertThat(response.getBody().get(i).getName(), equalTo("Item " + i));
             assertThat(response.getBody().get(i).getType(), equalTo("Type " + i));
-            assertThat(response.getBody().get(i).getPrice(), equalTo(new BigDecimal(1000 * (i + 1))));
+            // Add .00 expected value to match database stored value that is returned with .00 always.
+            assertThat(response.getBody().get(i).getPrice(), equalTo(
+                    new BigDecimal(1000 * (i + 1)).setScale(2, BigDecimal.ROUND_HALF_EVEN))
+            );
         }
     }
 }
