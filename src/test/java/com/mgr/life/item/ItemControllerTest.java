@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -41,6 +42,10 @@ public class ItemControllerTest {
         MockitoAnnotations.initMocks(this);
 
         mvc = MockMvcBuilders.standaloneSetup(itemController).build();
+    }
+
+    @Test
+    public void itemGetTest() throws Exception {
 
         List<Item> data = new ArrayList<>();
 
@@ -49,10 +54,7 @@ public class ItemControllerTest {
         }
 
         when(itemRepository.findAll()).thenReturn(data);
-    }
 
-    @Test
-    public void itemGetTest() throws Exception {
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
                         .get(END_POINT)
@@ -68,5 +70,23 @@ public class ItemControllerTest {
                     .andExpect(jsonPath("$[" + i + "].type", is("Type " + i)))
                     .andExpect(jsonPath("$[" + i + "].price", is(new BigDecimal(1000.99 * (i + 1)))));
         }
+    }
+
+    @Test
+    public void itemPostTest() throws Exception {
+
+        when(itemRepository.save(Mockito.any()))
+                .thenReturn(new Item((long) 1, "Test Item", "Test Type", new BigDecimal(3000.50)));
+
+        mvc.perform(
+                MockMvcRequestBuilders
+                        .post(END_POINT)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content("{\"name\":\"Test Item\",\"type\":\"Test Type\",\"price\":3000.50}")
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content()
+                        .json("{\"id\":1,\"name\":\"Test Item\",\"type\":\"Test Type\",\"price\":3000.50}"));
     }
 }
