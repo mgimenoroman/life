@@ -46,7 +46,7 @@ public class ItemControllerIntegrationTest {
         assertThat(response.getBody(), notNullValue());
 
         for (int i = 0; i < 2; i++) {
-            assertThat(response.getBody().get(i).getId(), equalTo((long) i));
+            assertThat(response.getBody().get(i).getId(), equalTo((long) i + 1));
             assertThat(response.getBody().get(i).getName(), equalTo("Item " + i));
             assertThat(response.getBody().get(i).getType(), equalTo("Type " + i));
             assertThat(response.getBody().get(i).getPrice(), equalTo(new BigDecimal(1000 * (i + 1))));

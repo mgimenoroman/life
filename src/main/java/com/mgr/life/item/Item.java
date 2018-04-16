@@ -1,10 +1,16 @@
 package com.mgr.life.item;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
+@Entity
 public class Item {
 
-    private long id;
+    @Id
+    @GeneratedValue
+    private Long id;
     private String name;
     private String type;
     private BigDecimal price;
@@ -12,18 +18,17 @@ public class Item {
     public Item() {
     }
 
-    public Item(long id, String name, String type, BigDecimal price) {
-        this.id = id;
+    public Item(String name, String type, BigDecimal price) {
         this.name = name;
         this.type = type;
         this.price = price;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public Item setId(long id) {
+    public Item setId(Long id) {
         this.id = id;
         return this;
     }
