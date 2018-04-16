@@ -1,4 +1,4 @@
-package com.mgr.life.swagger;
+package com.mgr.life.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

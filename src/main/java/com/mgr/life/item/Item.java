@@ -18,6 +18,13 @@ public class Item {
     public Item() {
     }
 
+    public Item(Long id, String name, String type, BigDecimal price) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.price = price;
+    }
+
     public Item(String name, String type, BigDecimal price) {
         this.name = name;
         this.type = type;
