@@ -33,4 +33,10 @@ public class ItemController {
     public ResponseEntity<Item> itemPost(@RequestBody Item item) {
         return new ResponseEntity<>(itemRepository.save(item), HttpStatus.CREATED);
     }
+
+    @RequestMapping(method = RequestMethod.PUT)
+    @ApiOperation(value = "Update an Item", response = Item.class)
+    public Item itemPut(@RequestBody Item item) {
+        return itemRepository.save(item);
+    }
 }
