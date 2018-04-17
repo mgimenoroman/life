@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -23,6 +22,7 @@ import static com.mgr.life.item.ItemController.END_POINT;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -58,9 +58,9 @@ public class ItemControllerTest {
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
                         .get(END_POINT)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)));
 
         for (int i = 0; i < 2; i++) {
@@ -81,11 +81,11 @@ public class ItemControllerTest {
         mvc.perform(
                 MockMvcRequestBuilders
                         .post(END_POINT)
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .contentType(APPLICATION_JSON_UTF8)
                         .content("{\"name\":\"Test Item\",\"type\":\"Test Type\",\"price\":3000.50}")
-                        .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                        .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content()
                         .json("{\"id\":1,\"name\":\"Test Item\",\"type\":\"Test Type\",\"price\":3000.50}"));
     }
