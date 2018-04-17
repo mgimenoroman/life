@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,10 +42,10 @@ public class ItemController {
         return itemRepository.save(item);
     }
 
-    @RequestMapping(method = DELETE)
+    @RequestMapping(path = "/{id}", method = DELETE)
     @ApiOperation(value = "Delete an Item")
-    public ResponseEntity itemDelete(@RequestBody Item item) {
-        itemRepository.deleteById(item.getId());
+    public ResponseEntity itemDelete(@PathVariable Long id) {
+        itemRepository.deleteById(id);
         return new ResponseEntity(NO_CONTENT);
     }
 }

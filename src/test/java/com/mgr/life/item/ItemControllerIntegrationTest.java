@@ -131,7 +131,7 @@ public class ItemControllerIntegrationTest {
 
         Item toDelete = itemRepository.save(new Item("Test Item", "Test Type", new BigDecimal(3000.50)));
 
-        ResponseEntity<Item> response = template.exchange(base.toString(), DELETE, new HttpEntity<>(toDelete), Item.class);
+        ResponseEntity response = template.exchange(base.toString() + "/{id}", DELETE, null, Void.class, 1);
 
         assertThat(response.getStatusCode(), is(NO_CONTENT));
         assertThat(response.getBody(), nullValue());

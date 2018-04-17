@@ -113,10 +113,7 @@ public class ItemControllerTest {
 
         mvc.perform(
                 MockMvcRequestBuilders
-                        .delete(END_POINT)
-                        .contentType(APPLICATION_JSON_UTF8)
-                        .content("{\"id\":1,\"name\":\"Test Item\",\"type\":\"Test Type\",\"price\":3000.50}")
-                        .accept(APPLICATION_JSON_UTF8))
+                        .delete(END_POINT + "/{id}", 1))
                 .andExpect(status().isNoContent());
     }
 }
