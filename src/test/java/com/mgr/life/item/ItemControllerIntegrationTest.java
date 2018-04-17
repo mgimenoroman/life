@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -19,8 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mgr.life.item.ItemController.END_POINT;
+import static java.math.BigDecimal.ROUND_HALF_EVEN;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -54,7 +56,7 @@ public class ItemControllerIntegrationTest {
 
         itemRepository.saveAll(data);
 
-        ResponseEntity<List<Item>> response = template.exchange(base.toString(), HttpMethod.GET, null,
+        ResponseEntity<List<Item>> response = template.exchange(base.toString(), GET, null,
                 new ParameterizedTypeReference<List<Item>>() {
                 });
         assertThat(response.getBody(), notNullValue());
@@ -66,7 +68,7 @@ public class ItemControllerIntegrationTest {
             assertThat(response.getBody().get(i).getType(), equalTo("Type " + i));
             // Add .00 expected value to match database stored value that is returned with .00 always.
             assertThat(response.getBody().get(i).getPrice(), equalTo(
-                    new BigDecimal(1000 * (i + 1)).setScale(2, BigDecimal.ROUND_HALF_EVEN))
+                    new BigDecimal(1000 * (i + 1)).setScale(2, ROUND_HALF_EVEN))
             );
         }
     }
@@ -78,6 +80,7 @@ public class ItemControllerIntegrationTest {
                 new Item("Test Item", "Test Type", new BigDecimal(3000.50)),
                 Item.class);
 
+        assertThat(response.getStatusCode(), is(CREATED));
         assertThat(response.getBody(), notNullValue());
         assertThat(response.getBody().getId(), equalTo(1L));
         assertThat(response.getBody().getName(), equalTo("Test Item"));
@@ -94,6 +97,7 @@ public class ItemControllerIntegrationTest {
 
         ResponseEntity<Item> response = template.postForEntity(base.toString(), toUpdate, Item.class);
 
+        assertThat(response.getStatusCode(), is(CREATED));
         assertThat(response.getBody(), notNullValue());
         assertThat(response.getBody().getId(), equalTo(1L));
         assertThat(response.getBody().getName(), equalTo("Test Item modified"));
