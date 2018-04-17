@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 import static com.mgr.life.item.ItemController.END_POINT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -28,6 +30,12 @@ public class ItemController {
     @ApiOperation(value = "Find all Items", response = Item.class, responseContainer = "List")
     public Iterable<Item> itemGet() {
         return itemRepository.findAll();
+    }
+
+    @RequestMapping(path = "{id}", method = GET)
+    @ApiOperation(value = "Find an Item by id", response = Item.class, responseContainer = "Optional")
+    public Optional<Item> itemGet(@PathVariable Long id) {
+        return itemRepository.findById(id);
     }
 
     @RequestMapping(method = POST)
