@@ -17,15 +17,14 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mgr.life.item.ItemController.END_POINT;
 import static java.math.BigDecimal.ROUND_HALF_EVEN;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpMethod.*;
+import static org.springframework.http.HttpStatus.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -125,5 +124,19 @@ public class ItemControllerIntegrationTest {
         assertThat(response.getBody().getName(), equalTo("Test Item modified"));
         assertThat(response.getBody().getType(), equalTo("Test Type modified"));
         assertThat(response.getBody().getPrice(), equalTo(new BigDecimal(5000)));
+    }
+
+    @Test
+    public void itemDeleteIntegrationTest() {
+
+        Item toDelete = itemRepository.save(new Item("Test Item", "Test Type", new BigDecimal(3000.50)));
+
+        ResponseEntity<Item> response = template.exchange(base.toString(), DELETE, new HttpEntity<>(toDelete), Item.class);
+
+        assertThat(response.getStatusCode(), is(NO_CONTENT));
+        assertThat(response.getBody(), nullValue());
+
+        Optional<Item> deleted = itemRepository.findById(toDelete.getId());
+        assertThat(deleted.isPresent(), is(false));
     }
 }

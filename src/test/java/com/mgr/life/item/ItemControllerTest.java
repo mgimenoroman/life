@@ -107,4 +107,16 @@ public class ItemControllerTest {
                 .andExpect(content()
                         .json("{\"id\":1,\"name\":\"Test Item Modified\",\"type\":\"Test Type Modified\",\"price\":5000}"));
     }
+
+    @Test
+    public void itemDeleteTest() throws Exception {
+
+        mvc.perform(
+                MockMvcRequestBuilders
+                        .delete(END_POINT)
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content("{\"id\":1,\"name\":\"Test Item\",\"type\":\"Test Type\",\"price\":3000.50}")
+                        .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isNoContent());
+    }
 }
