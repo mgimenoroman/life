@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -22,7 +23,9 @@ import static java.math.BigDecimal.ROUND_HALF_EVEN;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -59,6 +62,8 @@ public class ItemControllerIntegrationTest {
         ResponseEntity<List<Item>> response = template.exchange(base.toString(), GET, null,
                 new ParameterizedTypeReference<List<Item>>() {
                 });
+
+        assertThat(response.getStatusCode(), is(OK));
         assertThat(response.getBody(), notNullValue());
         assertThat(response.getBody(), hasSize(2));
 
@@ -98,6 +103,23 @@ public class ItemControllerIntegrationTest {
         ResponseEntity<Item> response = template.postForEntity(base.toString(), toUpdate, Item.class);
 
         assertThat(response.getStatusCode(), is(CREATED));
+        assertThat(response.getBody(), notNullValue());
+        assertThat(response.getBody().getId(), equalTo(1L));
+        assertThat(response.getBody().getName(), equalTo("Test Item modified"));
+        assertThat(response.getBody().getType(), equalTo("Test Type modified"));
+        assertThat(response.getBody().getPrice(), equalTo(new BigDecimal(5000)));
+    }
+
+    @Test
+    public void itemPutIntegrationTest() {
+
+        Item toUpdate = itemRepository.save(new Item("Test Item", "Test Type", new BigDecimal(3000.50)));
+
+        toUpdate.setName("Test Item modified").setType("Test Type modified").setPrice(new BigDecimal(5000));
+
+        ResponseEntity<Item> response = template.exchange(base.toString(), PUT, new HttpEntity<>(toUpdate), Item.class);
+
+        assertThat(response.getStatusCode(), is(OK));
         assertThat(response.getBody(), notNullValue());
         assertThat(response.getBody().getId(), equalTo(1L));
         assertThat(response.getBody().getName(), equalTo("Test Item modified"));

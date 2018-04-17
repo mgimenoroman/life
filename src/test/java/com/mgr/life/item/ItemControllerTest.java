@@ -89,4 +89,22 @@ public class ItemControllerTest {
                 .andExpect(content()
                         .json("{\"id\":1,\"name\":\"Test Item\",\"type\":\"Test Type\",\"price\":3000.50}"));
     }
+
+    @Test
+    public void itemPutTest() throws Exception {
+
+        when(itemRepository.save(Mockito.any()))
+                .thenReturn(new Item((long) 1, "Test Item Modified", "Test Type Modified", new BigDecimal(5000)));
+
+        mvc.perform(
+                MockMvcRequestBuilders
+                        .put(END_POINT)
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content("{\"id\":1,\"name\":\"Test Item Modified\",\"type\":\"Test Type Modified\",\"price\":5000}")
+                        .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(content()
+                        .json("{\"id\":1,\"name\":\"Test Item Modified\",\"type\":\"Test Type Modified\",\"price\":5000}"));
+    }
 }
