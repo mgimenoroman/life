@@ -48,15 +48,15 @@ public class ItemControllerIntegrationTest {
     }
 
     @Test
-    public void itemGetIntegrationTest() {
+    public void itemGetAllIntegrationTest() {
 
-        List<Item> data = new ArrayList<>();
+        List<Item> savedItems = new ArrayList<>();
 
         for (int x = 0; x < 2; x++) {
-            data.add(new Item((long) x + 1, "Item " + x, "Type " + x, new BigDecimal(1000 * (x + 1))));
+            savedItems.add(new Item("Item " + x, "Type " + x, new BigDecimal(1000 * (x + 1))));
         }
 
-        itemRepository.saveAll(data);
+        itemRepository.saveAll(savedItems);
 
         ResponseEntity<List<Item>> response = template.exchange(base.toString(), GET, null,
                 new ParameterizedTypeReference<List<Item>>() {
@@ -67,29 +67,49 @@ public class ItemControllerIntegrationTest {
         assertThat(response.getBody(), hasSize(2));
 
         for (int i = 0; i < 2; i++) {
-            assertThat(response.getBody().get(i).getId(), equalTo((long) i + 1));
-            assertThat(response.getBody().get(i).getName(), equalTo("Item " + i));
-            assertThat(response.getBody().get(i).getType(), equalTo("Type " + i));
-            // Add .00 expected value to match database stored value that is returned with .00 always.
-            assertThat(response.getBody().get(i).getPrice(), equalTo(
-                    new BigDecimal(1000 * (i + 1)).setScale(2, ROUND_HALF_EVEN))
+            assertThat(response.getBody().get(i).getId(), equalTo(savedItems.get(i).getId()));
+            assertThat(response.getBody().get(i).getName(), equalTo(savedItems.get(i).getName()));
+            assertThat(response.getBody().get(i).getType(), equalTo(savedItems.get(i).getType()));
+            // Add .00 to expected value to match database stored value that is returned with .00.
+            assertThat(response.getBody().get(i).getPrice(), equalTo(savedItems.get(i).getPrice()
+                    .setScale(2, ROUND_HALF_EVEN))
             );
         }
     }
 
     @Test
+    public void itemGetOneIntegrationTest() {
+
+        Item savedItem = itemRepository.save(new Item("Item 1", "Type 1", new BigDecimal(1000)));
+
+        ResponseEntity<Item> response = template.exchange(base.toString() + "/{id}", GET, null,
+                Item.class, savedItem.getId());
+
+        assertThat(response.getStatusCode(), is(OK));
+        assertThat(response.getBody(), notNullValue());
+
+        assertThat(response.getBody().getId(), equalTo(savedItem.getId()));
+        assertThat(response.getBody().getName(), equalTo(savedItem.getName()));
+        assertThat(response.getBody().getType(), equalTo(savedItem.getType()));
+        // Add .00 to expected value to match database stored value that is returned with .00.
+        assertThat(response.getBody().getPrice(), equalTo(savedItem.getPrice()
+                .setScale(2, ROUND_HALF_EVEN))
+        );
+    }
+
+    @Test
     public void itemPostSaveIntegrationTest() {
 
-        ResponseEntity<Item> response = template.postForEntity(base.toString(),
-                new Item("Test Item", "Test Type", new BigDecimal(3000.50)),
-                Item.class);
+        Item toSave = new Item("Test Item", "Test Type", new BigDecimal(3000.50));
+
+        ResponseEntity<Item> response = template.postForEntity(base.toString(), toSave, Item.class);
 
         assertThat(response.getStatusCode(), is(CREATED));
         assertThat(response.getBody(), notNullValue());
         assertThat(response.getBody().getId(), equalTo(1L));
-        assertThat(response.getBody().getName(), equalTo("Test Item"));
-        assertThat(response.getBody().getType(), equalTo("Test Type"));
-        assertThat(response.getBody().getPrice(), equalTo(new BigDecimal(3000.50)));
+        assertThat(response.getBody().getName(), equalTo(toSave.getName()));
+        assertThat(response.getBody().getType(), equalTo(toSave.getType()));
+        assertThat(response.getBody().getPrice(), equalTo(toSave.getPrice()));
     }
 
     @Test
@@ -103,10 +123,10 @@ public class ItemControllerIntegrationTest {
 
         assertThat(response.getStatusCode(), is(CREATED));
         assertThat(response.getBody(), notNullValue());
-        assertThat(response.getBody().getId(), equalTo(1L));
-        assertThat(response.getBody().getName(), equalTo("Test Item modified"));
-        assertThat(response.getBody().getType(), equalTo("Test Type modified"));
-        assertThat(response.getBody().getPrice(), equalTo(new BigDecimal(5000)));
+        assertThat(response.getBody().getId(), equalTo(toUpdate.getId()));
+        assertThat(response.getBody().getName(), equalTo(toUpdate.getName()));
+        assertThat(response.getBody().getType(), equalTo(toUpdate.getType()));
+        assertThat(response.getBody().getPrice(), equalTo(toUpdate.getPrice()));
     }
 
     @Test
@@ -120,10 +140,10 @@ public class ItemControllerIntegrationTest {
 
         assertThat(response.getStatusCode(), is(OK));
         assertThat(response.getBody(), notNullValue());
-        assertThat(response.getBody().getId(), equalTo(1L));
-        assertThat(response.getBody().getName(), equalTo("Test Item modified"));
-        assertThat(response.getBody().getType(), equalTo("Test Type modified"));
-        assertThat(response.getBody().getPrice(), equalTo(new BigDecimal(5000)));
+        assertThat(response.getBody().getId(), equalTo(toUpdate.getId()));
+        assertThat(response.getBody().getName(), equalTo(toUpdate.getName()));
+        assertThat(response.getBody().getType(), equalTo(toUpdate.getType()));
+        assertThat(response.getBody().getPrice(), equalTo(toUpdate.getPrice()));
     }
 
     @Test

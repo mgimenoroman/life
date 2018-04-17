@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mgr.life.item.ItemController.END_POINT;
 import static org.hamcrest.CoreMatchers.is;
@@ -40,20 +41,20 @@ public class ItemControllerTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-
         mvc = MockMvcBuilders.standaloneSetup(itemController).build();
     }
 
     @Test
-    public void itemGetTest() throws Exception {
+    public void itemGetAllTest() throws Exception {
 
-        List<Item> data = new ArrayList<>();
+        List<Item> savedItems = new ArrayList<>();
 
         for (int x = 0; x < 2; x++) {
-            data.add(new Item((long) x + 1, "Item " + x, "Type " + x, new BigDecimal(1000.99 * (x + 1))));
+            savedItems.add(new Item((long) x + 1, "Item " + x, "Type " + x,
+                    new BigDecimal(1000.99 * (x + 1))));
         }
 
-        when(itemRepository.findAll()).thenReturn(data);
+        when(itemRepository.findAll()).thenReturn(savedItems);
 
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
@@ -66,17 +67,33 @@ public class ItemControllerTest {
         for (int i = 0; i < 2; i++) {
             resultActions
                     .andExpect(jsonPath("$[" + i + "].id", is(i + 1)))
-                    .andExpect(jsonPath("$[" + i + "].name", is("Item " + i)))
-                    .andExpect(jsonPath("$[" + i + "].type", is("Type " + i)))
-                    .andExpect(jsonPath("$[" + i + "].price", is(new BigDecimal(1000.99 * (i + 1)))));
+                    .andExpect(jsonPath("$[" + i + "].name", is(savedItems.get(i).getName())))
+                    .andExpect(jsonPath("$[" + i + "].type", is(savedItems.get(i).getType())))
+                    .andExpect(jsonPath("$[" + i + "].price", is(savedItems.get(i).getPrice())));
         }
+    }
+
+    @Test
+    public void itemGetOneTest() throws Exception {
+
+        when(itemRepository.findById(Mockito.eq(1L)))
+                .thenReturn(Optional.of(new Item(1L, "Item 1", "Type 1", new BigDecimal(1000))));
+
+        mvc.perform(
+                MockMvcRequestBuilders
+                        .get(END_POINT + "/{id}", 1)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(content()
+                        .json("{\"id\":1,\"name\":\"Item 1\",\"type\":\"Type 1\",\"price\":1000}"));
     }
 
     @Test
     public void itemPostTest() throws Exception {
 
         when(itemRepository.save(Mockito.any()))
-                .thenReturn(new Item((long) 1, "Test Item", "Test Type", new BigDecimal(3000.50)));
+                .thenReturn(new Item(1L, "Test Item", "Test Type", new BigDecimal(3000.50)));
 
         mvc.perform(
                 MockMvcRequestBuilders
