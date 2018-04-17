@@ -72,7 +72,7 @@ public class ItemControllerIntegrationTest {
     }
 
     @Test
-    public void itemPostIntegrationTest() {
+    public void itemPostSaveIntegrationTest() {
 
         ResponseEntity<Item> response = template.postForEntity(base.toString(),
                 new Item("Test Item", "Test Type", new BigDecimal(3000.50)),
@@ -83,5 +83,21 @@ public class ItemControllerIntegrationTest {
         assertThat(response.getBody().getName(), equalTo("Test Item"));
         assertThat(response.getBody().getType(), equalTo("Test Type"));
         assertThat(response.getBody().getPrice(), equalTo(new BigDecimal(3000.50)));
+    }
+
+    @Test
+    public void itemPostUpdateIntegrationTest() {
+
+        Item toUpdate = itemRepository.save(new Item("Test Item", "Test Type", new BigDecimal(3000.50)));
+
+        toUpdate.setName("Test Item modified").setType("Test Type modified").setPrice(new BigDecimal(5000));
+
+        ResponseEntity<Item> response = template.postForEntity(base.toString(), toUpdate, Item.class);
+
+        assertThat(response.getBody(), notNullValue());
+        assertThat(response.getBody().getId(), equalTo(1L));
+        assertThat(response.getBody().getName(), equalTo("Test Item modified"));
+        assertThat(response.getBody().getType(), equalTo("Test Type modified"));
+        assertThat(response.getBody().getPrice(), equalTo(new BigDecimal(5000)));
     }
 }
