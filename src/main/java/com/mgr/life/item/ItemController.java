@@ -41,6 +41,10 @@ public class ItemController {
     @RequestMapping(method = POST)
     @ApiOperation(value = "Save or update an Item", response = Item.class)
     public ResponseEntity<Item> itemPost(@RequestBody Item item) {
+
+        // Remove id if it's set to prevent update
+        item.setId(null);
+
         return new ResponseEntity<>(itemRepository.save(item), CREATED);
     }
 
