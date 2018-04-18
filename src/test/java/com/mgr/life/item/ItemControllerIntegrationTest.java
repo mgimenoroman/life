@@ -113,7 +113,7 @@ public class ItemControllerIntegrationTest {
     }
 
     @Test
-    public void itemPostUpdateIntegrationTest() {
+    public void itemPostDoesNotUpdateIntegrationTest() {
 
         Item toUpdate = itemRepository.save(new Item("Test Item", "Test Type", new BigDecimal(3000.50)));
 
@@ -123,7 +123,7 @@ public class ItemControllerIntegrationTest {
 
         assertThat(response.getStatusCode(), is(CREATED));
         assertThat(response.getBody(), notNullValue());
-        assertThat(response.getBody().getId(), equalTo(toUpdate.getId()));
+        assertThat(response.getBody().getId(), equalTo(2L));
         assertThat(response.getBody().getName(), equalTo(toUpdate.getName()));
         assertThat(response.getBody().getType(), equalTo(toUpdate.getType()));
         assertThat(response.getBody().getPrice(), equalTo(toUpdate.getPrice()));
