@@ -150,6 +150,20 @@ public abstract class IntegrationTest<T extends RestEntity> {
     }
 
     @Test
+    public void putNoIdIntegrationTest() {
+
+        T toUpdate = repository().save(newRestEntity());
+
+        toUpdate = modifyRestEntity(toUpdate);
+        toUpdate.setId(null);
+
+        ResponseEntity<T> response = template.exchange(base.toString(), PUT, new HttpEntity<>(toUpdate), classType);
+
+        assertThat(response.getStatusCode(), is(BAD_REQUEST));
+        assertThat(response.getBody(), nullValue());
+    }
+
+    @Test
     public void deleteIntegrationTest() {
 
         T toDelete = repository().save(newRestEntity());
