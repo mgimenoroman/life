@@ -1,25 +1,26 @@
 package com.mgr.life.item;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.mgr.life.RestEntity;
+
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.math.BigDecimal;
+import java.util.Objects;
+
+import static java.math.BigDecimal.ROUND_HALF_EVEN;
 
 @Entity
-public class Item {
+@JsonDeserialize(as = Item.class)
+public class Item extends RestEntity {
 
-    @Id
-    @GeneratedValue
-    private Long id;
-    private String name;
-    private String type;
+    private String name, type;
     private BigDecimal price;
 
     public Item() {
     }
 
     public Item(Long id, String name, String type, BigDecimal price) {
-        this.id = id;
+        super(id);
         this.name = name;
         this.type = type;
         this.price = price;
@@ -29,15 +30,6 @@ public class Item {
         this.name = name;
         this.type = type;
         this.price = price;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Item setId(Long id) {
-        this.id = id;
-        return this;
     }
 
     public String getName() {
@@ -65,5 +57,29 @@ public class Item {
     public Item setPrice(BigDecimal price) {
         this.price = price;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        boolean result = Objects.equals(name, item.name) &&
+                Objects.equals(type, item.type);
+
+        if (result) {
+            if (price != null && item.price != null) {
+                return Objects.equals(price.setScale(2, ROUND_HALF_EVEN), item.price.setScale(2, ROUND_HALF_EVEN));
+            } else {
+                return Objects.equals(price, item.price);
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, price);
     }
 }
