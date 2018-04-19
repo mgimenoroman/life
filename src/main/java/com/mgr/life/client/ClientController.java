@@ -1,4 +1,4 @@
-package com.mgr.life.item;
+package com.mgr.life.client;
 
 import com.mgr.life.CRUDController;
 import io.swagger.annotations.Api;
@@ -7,21 +7,21 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.mgr.life.item.ItemController.END_POINT;
+import static com.mgr.life.client.ClientController.END_POINT;
 
 @RestController()
 @RequestMapping(path = END_POINT)
-@Api(value = "item", description = "Actions regarding items.")
-public class ItemController extends CRUDController<Item> {
+@Api(value = "client", description = "Actions regarding clients.")
+public class ClientController extends CRUDController<Client> {
 
-    static final String END_POINT = "/item";
+    static final String END_POINT = "/client";
 
     @Autowired
-    private ItemRepository itemRepository;
+    private ClientRepository clientRepository;
 
     @Override
-    protected CrudRepository<Item, Long> repository() {
-        return itemRepository;
+    protected CrudRepository<Client, Long> repository() {
+        return clientRepository;
     }
 
     @Override
