@@ -29,27 +29,30 @@ public abstract class CRUDController<T extends RestEntity> {
     }
 
     @RequestMapping(method = POST)
-    public ResponseEntity<T> post(@RequestBody T entity) throws URISyntaxException {
+    public ResponseEntity<T> post(@RequestBody T restEntity) throws URISyntaxException {
 
         // FIXME: Remove id property from Swagger Client model when post
 
         // Remove id if it's set to prevent update
-        entity.setId(null);
+        restEntity.setId(null);
 
-        entity = repository().save(entity);
+        restEntity = repository().save(restEntity);
 
-        return ResponseEntity.created(new URI(endPoint() + "/" + entity.getId())).body(entity);
+        return ResponseEntity.created(new URI(endPoint() + "/" + restEntity.getId())).body(restEntity);
     }
 
     @RequestMapping(method = PUT)
-    public ResponseEntity<T> put(@RequestBody T client) {
+    public ResponseEntity<T> put(@RequestBody T restEntity) {
 
-        // Return BAD_REQUEST http status if given Item has no id (not possible to update)
-        if (client.getId() == null) {
+        if (restEntity.getId() == null) {
+            // Return BAD_REQUEST http status if given RestEntity has no id
             return ResponseEntity.badRequest().build();
+        } else if (!repository().existsById(restEntity.getId())) {
+            // Return NOT_FOUND http status if given RestEntity does not exist
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(repository().save(client));
+        return ResponseEntity.ok().body(repository().save(restEntity));
     }
 
     @RequestMapping(path = "/{id}", method = DELETE)
