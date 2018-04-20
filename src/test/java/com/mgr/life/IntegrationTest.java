@@ -105,6 +105,16 @@ public abstract class IntegrationTest<T extends RestEntity> {
     }
 
     @Test
+    public void getOneNotFoundIntegrationTest() {
+
+        ResponseEntity<T> response = template.exchange(base.toString() + "/{id}", GET, null,
+                classType, 1);
+
+        assertThat(response.getStatusCode(), is(NOT_FOUND));
+        assertThat(response.getBody(), nullValue());
+    }
+
+    @Test
     public void postSaveIntegrationTest() {
 
         T toSave = newRestEntity();
