@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
@@ -45,6 +46,14 @@ public abstract class IntegrationTest<T extends RestEntity> {
 
     @Before
     public void setUp() throws Exception {
+
+        // Ensure that data and functionality provided by implementations of this class is OK
+        Objects.requireNonNull(endPoint(), "API endpoint can't be bull.");
+        Objects.requireNonNull(repository(), "API repository can't be null.");
+        Objects.requireNonNull(newRestEntity(), "API new RestEntity can't be null.");
+        assertThat("RestEntity returned by modifyRestEntity method can't be equal to newRestEntity.",
+                newRestEntity(), not(equalTo(modifyRestEntity(newRestEntity()))));
+
         this.base = new URL("http://localhost:" + port + endPoint());
     }
 
@@ -132,7 +141,6 @@ public abstract class IntegrationTest<T extends RestEntity> {
     public void postDoesNotUpdateIntegrationTest() {
 
         T toUpdate = repository().save(newRestEntity());
-
 
         toUpdate = modifyRestEntity(toUpdate);
 
