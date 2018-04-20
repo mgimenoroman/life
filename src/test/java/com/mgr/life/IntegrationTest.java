@@ -164,6 +164,18 @@ public abstract class IntegrationTest<T extends RestEntity> {
     }
 
     @Test
+    public void putNotExistingIntegrationTest() {
+
+        T toUpdate = modifyRestEntity(newRestEntity());
+        toUpdate.setId(1L);
+
+        ResponseEntity<T> response = template.exchange(base.toString(), PUT, new HttpEntity<>(toUpdate), classType);
+
+        assertThat(response.getStatusCode(), is(NOT_FOUND));
+        assertThat(response.getBody(), nullValue());
+    }
+
+    @Test
     public void deleteIntegrationTest() {
 
         T toDelete = repository().save(newRestEntity());
