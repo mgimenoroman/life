@@ -46,6 +46,8 @@ public abstract class UnitTest<T extends RestEntity> {
 
     protected abstract String modifiedRestEntityJsonWithId();
 
+    protected abstract String modifiedRestEntityJson();
+
     protected abstract void assertRestEntitiesProperties(List<T> savedRestEntities, ResultActions resultActions)
             throws Exception;
 
@@ -142,6 +144,18 @@ public abstract class UnitTest<T extends RestEntity> {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().json(modifiedRestEntityJsonWithId()));
+    }
+
+    @Test
+    public void putNoIdTest() throws Exception {
+
+        mvc.perform(
+                MockMvcRequestBuilders
+                        .put(endPoint())
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content(modifiedRestEntityJson())
+                        .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

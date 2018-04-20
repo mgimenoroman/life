@@ -77,6 +77,15 @@ public class ClientControllerTest extends UnitTest<Client> {
     }
 
     @Override
+    protected String modifiedRestEntityJson() {
+        return "{\"name\":\"Client Name Modified 1\",\"surname\":\"Client Surname Modified 1\"," +
+                "\"email\":\"testmodified1@email.com\",\"streetName\":\"Client Street Name Modified 1\"," +
+                "\"streetNumber\":\"DEF456 1\",\"city\":\"Client City Modified 1\"," +
+                "\"country\":\"Client Country Modified 1\",\"zipCode\":5678,\"phonePrefix\":20," +
+                "\"phone\":777888777}";
+    }
+
+    @Override
     protected void assertRestEntitiesProperties(List<Client> savedRestEntities, ResultActions resultActions)
             throws Exception {
 
