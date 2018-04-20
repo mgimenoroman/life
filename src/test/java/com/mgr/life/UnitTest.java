@@ -102,7 +102,8 @@ public abstract class UnitTest<T extends RestEntity> {
     @Test
     public void getOneTest() throws Exception {
 
-        when(repository().findById(Mockito.eq(1L))).thenReturn(Optional.of(newRestEntityWithId()));
+        when(repository().findById(1L)).thenReturn(Optional.of(newRestEntityWithId()));
+        when(repository().existsById(1L)).thenReturn(true);
 
         mvc.perform(
                 MockMvcRequestBuilders
@@ -111,6 +112,18 @@ public abstract class UnitTest<T extends RestEntity> {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().json(newRestEntityJsonWithId()));
+    }
+
+    @Test
+    public void getOneNotFoundTest() throws Exception {
+
+        when(repository().existsById(1L)).thenReturn(false);
+
+        mvc.perform(
+                MockMvcRequestBuilders
+                        .get(endPoint() + "/{id}", 1)
+                        .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isNotFound());
     }
 
     @Test
