@@ -62,6 +62,11 @@ public class ItemControllerTest extends UnitTest<Item> {
     }
 
     @Override
+    protected String modifiedRestEntityJson() {
+        return "{\"name\":\"Test Item Modified\",\"type\":\"Test Type Modified\",\"price\":5000}";
+    }
+
+    @Override
     protected void assertRestEntitiesProperties(List<Item> savedRestEntities, ResultActions resultActions)
             throws Exception {
         for (int i = 0; i < savedRestEntities.size(); i++) {
