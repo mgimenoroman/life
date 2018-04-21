@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -53,6 +54,12 @@ public abstract class UnitTest<T extends RestEntity> {
 
     @Before
     public void setup() {
+
+        // Ensure that data and functionality provided by implementations of this class is OK
+        Objects.requireNonNull(controllers(), "API controllers can't be bull.");
+        Objects.requireNonNull(endPoint(), "API endpoint can't be bull.");
+        Objects.requireNonNull(repository(), "API repository can't be null.");
+
         MockitoAnnotations.initMocks(this);
         mvc = MockMvcBuilders.standaloneSetup(controllers()).build();
     }
