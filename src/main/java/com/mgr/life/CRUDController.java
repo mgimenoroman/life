@@ -23,7 +23,7 @@ public abstract class CRUDController<T extends RestEntity> {
         return ResponseEntity.ok().body(repository().findAll());
     }
 
-    @RequestMapping(path = "{id}", method = GET)
+    @RequestMapping(method = GET, path = "{id}")
     public ResponseEntity<Optional<T>> get(@PathVariable Long id) {
 
         if (repository().existsById(id)) {
@@ -60,7 +60,7 @@ public abstract class CRUDController<T extends RestEntity> {
         return ResponseEntity.ok().body(repository().save(restEntity));
     }
 
-    @RequestMapping(path = "/{id}", method = DELETE)
+    @RequestMapping(method = DELETE, path = "/{id}")
     public ResponseEntity delete(@PathVariable Long id) {
 
         repository().deleteById(id);
