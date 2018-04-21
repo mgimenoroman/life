@@ -50,7 +50,7 @@ public abstract class IntegrationTest<T extends RestEntity> {
         // Ensure that data and functionality provided by implementations of this class is OK
         Objects.requireNonNull(endPoint(), "API endpoint can't be bull.");
         Objects.requireNonNull(repository(), "API repository can't be null.");
-        Objects.requireNonNull(newRestEntity(), "API new RestEntity can't be null.");
+        Objects.requireNonNull(newRestEntity(), "API newRestEntity can't be null.");
         assertThat("RestEntity returned by modifyRestEntity method can't be equal to newRestEntity.",
                 newRestEntity(), not(equalTo(modifyRestEntity(newRestEntity()))));
 
