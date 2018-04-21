@@ -59,6 +59,10 @@ public abstract class UnitTest<T extends RestEntity> {
         Objects.requireNonNull(controllers(), "API controllers can't be bull.");
         Objects.requireNonNull(endPoint(), "API endpoint can't be bull.");
         Objects.requireNonNull(repository(), "API repository can't be null.");
+        Objects.requireNonNull(newRestEntityWithId(), "API newRestEntityWithId can't be null.");
+        Objects.requireNonNull(newRestEntityWithId().getId(), "API newRestEntityWithId must have id can't be null.");
+        Objects.requireNonNull(modifiedRestEntityWithId(), "API modifiedRestEntityWithId can't be null.");
+        Objects.requireNonNull(modifiedRestEntityWithId().getId(), "API modifiedRestEntityWithId must have id can't be null.");
 
         MockitoAnnotations.initMocks(this);
         mvc = MockMvcBuilders.standaloneSetup(controllers()).build();
